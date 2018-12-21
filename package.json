@@ -1,5 +1,6 @@
 {
-  "name": "stripe",
+  "name": "stripe-example",
+  "private": false,
   "version": "0.1.0",
   "description": "",
   "main": "server/index.js",
@@ -13,8 +14,10 @@
   "author": "Taras Labiak <taras.labiak@indeema.com>",
   "license": "ISC",
   "dependencies": {
+    "auxiliary": "0.0.2",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.11",
+    "stripe": "^6.20.0"
   }
 }
