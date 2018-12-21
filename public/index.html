@@ -9,38 +9,48 @@
         justify-content: center;
       }
 
-      #payment-form {
+      form {
         width: 400px;
       }
     </style>
-    <script
-      src="https://code.jquery.com/jquery-3.3.1.min.js"
-      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
   </head>
   <body>
-    <form action="/receive" method="post" id="payment-form">
-      <div class="form-row">
-        <label for="card-element"> Credit or debit card </label>
-        <div id="card-element">
-          <!-- A Stripe Element will be inserted here. -->
+    <div id="app">
+      <form id="amount-form">
+        <label> Amount: <input id="amount" /> </label>
+        <button type="submit">Create Payment</button>
+      </form>
+      <form id="payment-form" style="display: none">
+        <label> Name: <input id="cardholder-name" type="text" /> </label>
+        <div class="form-row">
+          <label for="card-element"> Credit or debit card </label>
+          <div id="card-element">
+            <!-- A Stripe Element will be inserted here. -->
+          </div>
+
+          <!-- Used to display Element errors. -->
+          <div id="card-errors" role="alert"></div>
         </div>
 
-        <!-- Used to display Element errors. -->
-        <div id="card-errors" role="alert"></div>
-      </div>
-
-      <button>Submit Payment</button>
-    </form>
+        <button>Submit Payment</button>
+      </form>
+    </div>
     <script>
-      function stripeTokenHandler(token) {
-        console.log(token);
-      }
+      $("#amount-form").submit(function(e) {
+        e.preventDefault();
+        const value = +$("#amount").val();
+        if (value >= 0.5) {
+          createPayment(Math.round(value * 100));
+        }
+      });
 
-      async function main() {
-        const config = await (await fetch("/config")).json();
-        const stripe = Stripe(config.publishable);
+      async function createPayment(amount) {
+        const config = (await axios.post("/payment/create", { amount })).data;
+        const stripe = Stripe(config.publishable, {
+          betas: ["payment_intent_beta_3"]
+        });
         const elements = stripe.elements();
         const style = {
           base: {
@@ -53,6 +63,19 @@
         // Create an instance of the card Element.
         const card = elements.create("card", { style });
 
+        async function handleCardPayment() {
+          const r = await stripe.handleCardPayment(config.client_secret, card, {
+            source_data: {
+              owner: { name: document.getElementById("cardholder-name").value }
+            }
+          });
+          if (r.paymentIntent && "succeeded" === r.paymentIntent.status) {
+            alert("Success");
+          }
+          else {
+            console.error(r);
+          }
+        }
         // Add an instance of the card Element into the `card-element` <div>.
         card.mount("#card-element");
 
@@ -65,28 +88,13 @@
           }
         });
 
-        const form = document.getElementById("payment-form");
-        form.addEventListener("submit", function(event) {
-          event.preventDefault();
-
-          stripe.createToken(card).then(function(result) {
-            if (result.error) {
-              // Inform the customer that there was an error.
-              const errorElement = document.getElementById("card-errors");
-              errorElement.textContent = result.error.message;
-            } else {
-              // Send the token to your server.
-              stripeTokenHandler(result.token);
-            }
+        $("#payment-form")
+          .show()
+          .submit(function(e) {
+            e.preventDefault();
+            handleCardPayment();
           });
-        });
-
-        // addEventListener('load', function() {
-        //   $('[name="cardnumber"]').val('4000000000000077');
-        // });
       }
-
-      void main();
     </script>
   </body>
 </html>
