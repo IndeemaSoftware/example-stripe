@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Stripe</title>
+    <script src="http://js.stripe.com/v3/"></script>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+      }
+
+      #payment-form {
+        width: 400px;
+      }
+    </style>
+    <script
+      src="https://code.jquery.com/jquery-3.3.1.min.js"
+      integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <form action="/receive" method="post" id="payment-form">
+      <div class="form-row">
+        <label for="card-element"> Credit or debit card </label>
+        <div id="card-element">
+          <!-- A Stripe Element will be inserted here. -->
+        </div>
+
+        <!-- Used to display Element errors. -->
+        <div id="card-errors" role="alert"></div>
+      </div>
+
+      <button>Submit Payment</button>
+    </form>
+    <script>
+      function stripeTokenHandler(token) {
+        console.log(token);
+      }
+
+      async function main() {
+        const config = await (await fetch("/config")).json();
+        const stripe = Stripe(config.publishable);
+        const elements = stripe.elements();
+        const style = {
+          base: {
+            // Add your base input styles here. For example:
+            fontSize: "16px",
+            color: "#32325d"
+          }
+        };
+
+        // Create an instance of the card Element.
+        const card = elements.create("card", { style });
+
+        // Add an instance of the card Element into the `card-element` <div>.
+        card.mount("#card-element");
+
+        card.addEventListener("change", function(event) {
+          const displayError = document.getElementById("card-errors");
+          if (event.error) {
+            displayError.textContent = event.error.message;
+          } else {
+            displayError.textContent = "";
+          }
+        });
+
+        const form = document.getElementById("payment-form");
+        form.addEventListener("submit", function(event) {
+          event.preventDefault();
+
+          stripe.createToken(card).then(function(result) {
+            if (result.error) {
+              // Inform the customer that there was an error.
+              const errorElement = document.getElementById("card-errors");
+              errorElement.textContent = result.error.message;
+            } else {
+              // Send the token to your server.
+              stripeTokenHandler(result.token);
+            }
+          });
+        });
+
+        // addEventListener('load', function() {
+        //   $('[name="cardnumber"]').val('4000000000000077');
+        // });
+      }
+
+      void main();
+    </script>
+  </body>
+</html>
