@@ -1,24 +1,26 @@
 {
-  "parser": "babel-eslint",
-  "extends": "prettier",
   "env": {
-      "commonjs": true,
-      "es6": true,
-      "node": true,
-      "browser": false
+    "browser": false,
+    "commonjs": true,
+    "es6": true,
+    "node": true
   },
-  "parserOptions": {
-      "ecmaFeatures": {
-          "experimentalObjectRestSpread": true,
-          "jsx": false
-      },
-      "sourceType": "module"
-  },
+  "extends": "prettier",
   "globals": {
     "strapi": true
   },
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true,
+      "jsx": false
+    },
+    "sourceType": "module"
+  },
   "rules": {
-    "indent": ["error", 2, { "SwitchCase": 1 }],
+    "indent": ["error", 2, {
+      "SwitchCase": 1
+    }],
     "linebreak-style": ["error", "unix"],
     "no-console": 0,
     "semi": ["error", "always"]

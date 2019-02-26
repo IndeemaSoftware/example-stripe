@@ -1,23 +1,28 @@
 {
-  "name": "stripe-example",
-  "private": false,
-  "version": "0.1.0",
-  "description": "",
+  "name": "example-stripe",
+  "private": true,
+  "version": "0.0.1",
   "main": "server/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git@git.indeema.com:taras.labiak/stripe.git"
-  },
   "author": "Taras Labiak <taras.labiak@indeema.com>",
-  "license": "ISC",
+  "license": "AGPL-3.0",
   "dependencies": {
-    "auxiliary": "0.0.2",
+    "auxiliary": "0.0.16",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "lodash": "^4.17.11",
     "stripe": "^6.20.0"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IndeemaSoftware/example-stripe.git"
+  },
+  "bugs": {
+    "url": "https://github.com/IndeemaSoftware/example-stripe/issues"
+  },
+  "homepage": "https://github.com/IndeemaSoftware/example-stripe#readme",
+  "description": ""
 }
